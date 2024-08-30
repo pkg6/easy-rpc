@@ -1,0 +1,24 @@
+{
+  "name": "pkg6/easy-rpc",
+  "description": "Detailed method of actual RPC method",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "zhiqiang",
+      "email": "zhiqiang2033@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "Pkg6\\EasyRPC\\": "src/"
+    }
+  },
+  "require-dev": {
+    "fguillot/json-rpc": "^1.3",
+    "hprose/hprose": "^v2.0"
+  }
+}
