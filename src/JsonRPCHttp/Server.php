@@ -24,9 +24,9 @@ class Server extends \JsonRPC\Server implements ServiceContract
         if (is_subclass_of($objectOrClass, Objects::class)) {
             (new ReflectionClass($objectOrClass))->newInstanceWithoutConstructor()->register($this);
         } else {
-            $ref = ObjectClass::methodCallbacks($objectOrClass);
+            $ref = ObjectClass::classMethods($objectOrClass);
             foreach ($ref as $value) {
-                list($new, $prefix, $methodName, $method) = $value;
+                list($new, $method, $methodName) = $value;
                 $this->getProcedureHandler()->withClassAndMethod($method, get_class($new), $methodName);
             }
         }

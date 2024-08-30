@@ -15,4 +15,15 @@ class Client extends \JsonRPC\Client implements ClientContract
         $this->authentication($username,$password);
         return $this;
     }
+
+    public function withTimeout($timeout)
+    {
+        $this->getHttpClient()->withTimeout($timeout);
+        return $this;
+    }
+    public function withDebug()
+    {
+        $this->getHttpClient()->withDebug();
+        return $this;
+    }
 }

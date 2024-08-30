@@ -32,15 +32,15 @@ class ObjectClass
     /**
      * @var callable
      */
-    protected static $methodNamePrefixCallback;
+    protected static $methodNameCallback;
 
     /**
      * @param callable $fn
      * @return void
      */
-    public static function setMethodNamePrefixCallback(callable $fn)
+    public static function setMethodNameCallback(callable $fn)
     {
-        self::$methodNamePrefixCallback = $fn;
+        self::$methodNameCallback = $fn;
     }
 
     /**
@@ -49,22 +49,22 @@ class ObjectClass
      * @param ReflectionMethod $reflectionMethod
      * @return mixed
      */
-    public static function getMethodNamePrefix($new, ReflectionClass $reflectionClass, ReflectionMethod $reflectionMethod)
+    public static function getMethodName($new, ReflectionClass $reflectionClass, ReflectionMethod $reflectionMethod)
     {
-        if (is_null(self::$methodNamePrefixCallback)) {
+        if (is_null(self::$methodNameCallback)) {
             $prefixMethod = 'prefix';
             $fn = function ($object, ReflectionClass $reflectionClass, ReflectionMethod $reflectionMethod) use ($prefixMethod) {
                 //默认情况下走类+方法名字(不走namespace)
-                $prefix = self::class_basename($object);
+                $prefix = self::classBasename($object);
                 if (method_exists($object, $prefixMethod)) {
                     $prefix = (string)$object->{$prefixMethod}();
                 }
-                return $prefix;
+                return $prefix . $reflectionMethod->getName();
             };
-            self::setMethodNamePrefixCallback($fn);
+            self::setMethodNameCallback($fn);
             self::$FILTER_METHODS = array_merge(self::$FILTER_METHODS, [$prefixMethod]);
         }
-        $methodNamePrefixCallback = self::$methodNamePrefixCallback;
+        $methodNamePrefixCallback = self::$methodNameCallback;
         return $methodNamePrefixCallback($new, $reflectionClass, $reflectionMethod);
     }
 
@@ -73,7 +73,7 @@ class ObjectClass
      * @return Generator
      * @throws ReflectionException
      */
-    public static function methodCallbacks($objectOrClass)
+    public static function classMethods($objectOrClass)
     {
         $ref = new ReflectionClass($objectOrClass);
         $methods = $ref->getMethods(ReflectionMethod::IS_PUBLIC);
@@ -83,9 +83,8 @@ class ObjectClass
                 continue;
             }
             $new = $ref->newInstanceWithoutConstructor();
-            $prefix = self::getMethodNamePrefix($new, $ref, $refMethod);
-            $method = $prefix . $methodName;
-            yield [$new, $prefix, $methodName, $method];
+            $method = self::getMethodName($new, $ref, $refMethod);
+            yield [$new, $method, $methodName];
         }
     }
 
@@ -93,7 +92,7 @@ class ObjectClass
      * @param $class
      * @return string
      */
-    public static function class_basename($class)
+    public static function classBasename($class)
     {
         $class = is_object($class) ? get_class($class) : $class;
         return basename(str_replace('\\', '/', $class));
@@ -102,7 +101,7 @@ class ObjectClass
     /**
      * @throws ReflectionException
      */
-    public static function class_name($class)
+    public static function className($class)
     {
         $ref = new ReflectionClass($class);
         return str_replace('\\', '', $ref->getNamespaceName()) . $ref->getShortName();

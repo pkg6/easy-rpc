@@ -10,6 +10,7 @@ $s = new Server();
 $s->addCallback('add',function ($a,$b){
     return $a + $b;
 });
+$s->allowHosts();
 $s->addObjectClass(Demo::class);
 $s->addObjectClass(Demo2::class);
 $s->start();
