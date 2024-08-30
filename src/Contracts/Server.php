@@ -7,6 +7,7 @@ use Closure;
 interface Server
 {
     /**
+     * Callback binding:
      * @param $method
      * @param Closure $callback
      * @return $this
@@ -14,6 +15,7 @@ interface Server
     public function addCallback($method, Closure $callback);
 
     /**
+     * Class/Method binding:
      * @param $objectOrClass
      * @return $this
      */

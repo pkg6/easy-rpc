@@ -1,6 +1,12 @@
 <?php
 class Demo
 {
+    /**
+     * @param $a
+     * @param $b
+     * @return mixed
+     * @uses $client->Demoadd(1,2)
+     */
     public function add($a,$b)
     {
         return $a + $b;
