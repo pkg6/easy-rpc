@@ -8,6 +8,7 @@ $s = new Server();
 $s->addCallback('add', function ($a, $b) {
     return $a + $b;
 });
+$s->withHandle(new LogServerHandle());
 $s->withAuthentications(['user1'=>'password1']);
 $s->addObjectClass(Demo::class);
 $s->addObjectClass(Demo2::class);

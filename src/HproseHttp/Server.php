@@ -6,14 +6,39 @@ use Closure;
 use Pkg6\EasyRPC\Contracts\Objects;
 use Pkg6\EasyRPC\Contracts\Server as ServiceContract;
 use Pkg6\EasyRPC\ObjectClass;
+use Pkg6\EasyRPC\Traits\SHandlerTrait;
 use Pkg6\EasyRPC\Validator\HostValidator;
 use Pkg6\EasyRPC\Validator\UserValidator;
 use ReflectionClass;
+use stdClass;
 
 class Server extends \Hprose\Http\Server implements ServiceContract
 {
+    use SHandlerTrait;
+
     protected $hosts = [];
     protected $users = [];
+
+    public function start()
+    {
+        $this->runHandles();
+        parent::start();
+    }
+
+    /**
+     * @return void
+     */
+    protected function runHandles()
+    {
+        $this->addInvokeHandler(function ($name, array &$args, stdClass $context, Closure $next) {
+            $result = $next($name, $args, $context);
+            foreach ($this->handles as $handle) {
+                $handle->handle($this, $name, $args, $result);
+            }
+            return $result;
+        });
+    }
+
 
     public function addCallback($method, Closure $callback)
     {
@@ -49,11 +74,13 @@ class Server extends \Hprose\Http\Server implements ServiceContract
         $this->users = $authentications;
         return $this;
     }
+
     public function allowHosts(array $hosts)
     {
         $this->hosts = $hosts;
         return $this;
     }
+
     public function handle($request = null, $response = null)
     {
         HostValidator::validate($this->hosts, $this->getAttribute('REMOTE_ADDR', null));
