@@ -36,6 +36,12 @@ interface Server
     public function allowHosts(array $hosts);
 
     /**
+     * @param SHandle $handle
+     * @return mixed
+     */
+    public function withHandle(SHandle $handle);
+
+    /**
      * @return mixed
      */
     public function start();
