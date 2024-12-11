@@ -32,8 +32,10 @@ class Server extends \Hprose\Http\Server implements ServiceContract
     {
         $this->addInvokeHandler(function ($name, array &$args, stdClass $context, Closure $next) {
             $result = $next($name, $args, $context);
-            foreach ($this->handles as $handle) {
-                $handle->handle($this, $name, $args, $result);
+            if (!empty($name)) {
+                foreach ($this->handles as $handle) {
+                    $handle->handle($this, $name, $args, $result);
+                }
             }
             return $result;
         });

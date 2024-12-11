@@ -46,10 +46,12 @@ class Server extends \JsonRPC\Server implements ServiceContract
     public function start()
     {
         $payload = $this->payload;
-        $method = $payload['method'];
-        $params = $payload['params'];
+        $method = $payload['method'] ?? "";
+        $params = $payload['params'] ?? [];
         $result = $this->execute();
-        $this->runHandles($method, $params, $result);
+        if (!empty($method)) {
+            $this->runHandles($method, $params, $result);
+        }
         echo $result;
     }
 
